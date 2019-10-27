@@ -57,8 +57,10 @@ def calculate_atm_ranking(client_location, atms):
         time_now = datetime.datetime(2019, 10, 26, 13, 15)
         approximate_tpm = get_statistical_tpm_rate(atm, time_now)
                     
-        # Assume that one transaction can take up to two minutes
-        # by taking into an account the time that we need to one person to come and subtracting it from 2 minutes, we will get on how much our queue will fill each minute, so by multiplying it by our walk time, we will get the amount of queue, and we will round it up to up(if you get 0.2 we will count it as 1 person, so just providing the worst case
+        # Assume that one transaction can take up to 2 minutes
+        # By taking into an account the time that is needed for one person to come and subtracting it from 2 minutes
+        # we can get prediction on how much our queue will fill each minute, so by multiplying it by our walk time
+        # we will get the size of queue, and it is rounded up to the next integeter for the worst case scenario
         trans_time = 2
         if approximate_tpm > 0 and trans_time > 1 / approximate_tpm:
             time_approx = time_to_go + math.ceil((time_to_go) / (abs(trans_time - 1 / approximate_tpm))) * trans_time
