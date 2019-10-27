@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,700,900' rel='stylesheet' type='text/css'>	
+	<link rel="stylesheet" type="text/css" href="style.css">
+  <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+	<meta name="viewport" content="width=device-width,initial-scale=1.0, user-scalable=yes">
+</head>
+<body>
+	<div class="container" id="main_container">
+	  <div class="card"></div>
+	  <div class="card">
+	    <h1 class="title">Withdrawal</h1>
+	    <form id="main_form">
+	      <div class="input-container">
+	        <input type="#{type}" id="withdraw_input" required="required"/>
+	        <label for="#{label}">Amount</label>
+	        <div class="bar"></div>
+	      </div>
+	      
+	      <div class="option-group">
+  <div class="option-container">
+
+    <input class="option-input" checked id="option-1" type="radio" name="options" />
+    <input class="option-input" id="option-2" type="radio" name="options" />
+    
+    <label class="option" for="option-1">
+      <span class="option__indicator"></span>
+      <span class="option__label">
+        1000 HUF
+      </span>
+    </label>
+
+    <label class="option" for="option-2">
+      <span class="option__indicator"></span>
+      <span class="option__label">
+        2000 HUF
+      </span>
+    </label>
+
+  </div>
+</div>
+<div class="option-group">
+  <div class="option-container">
+
+    <input class="option-input" id="option-3" type="radio" name="options" />
+    <input class="option-input" id="option-4" type="radio" name="options" />
+    
+    <label class="option" for="option-3">
+      <span class="option__indicator"></span>
+      <span class="option__label">
+        5000 HUF
+      </span>
+    </label>
+
+    <label class="option" for="option-4">
+      <span class="option__indicator"></span>
+      <span class="option__label">
+        10000 HUF
+      </span>
+    </label>
+
+  </div>
+</div>
+		<div class="button-container">
+	        <button id="find_nearest_atm"><span>Find nearest ATM</span></button>
+	      </div>
+	    </form>
+	  </div>
+	  <div class="card alt">
+	    <span id="deposit_button"><div class="toggle">DEPOSIT</div></span>
+	  </div>
+	</div>
+  <div id="near_atm_map">
+    <div id="map"></div>
+    <div id="qrcode"></div>
+    <div id="near_atm_list">
+      
+    </div>
+  </div>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="qrcode.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="script.js"></script>
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9HftSzUiYP1zfhvFqcf0hFL61IXfuuYE&callback=initMap">
+    </script>
+</body>
+</html>
