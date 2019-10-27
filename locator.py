@@ -21,10 +21,11 @@ class ATMLocatorService(RequestHandler):
     async def get(self, uuid):
         longitude = float(self.get_argument("longitude", 19.089563, True))
         latitude = float(self.get_argument("latitude", 47.451316, True))
+        deposit = bool(self.get_argument("deposit", False, True))
         point = [longitude, latitude]
         print('Current location is: ', point)
 
-        atms = await self.get_atms_in_radius(point, 3000)
+        atms = await self.get_atms_in_radius(point, 3000, deposit)
         data = await calculate_atm_ranking(point, atms)
 
         self.write(json.dumps({'type': 'atmlist', 'data': data}))
@@ -32,8 +33,8 @@ class ATMLocatorService(RequestHandler):
         if data:
             await store_pending_visitor(uuid, data[0]['_id'], datetime.datetime.now(), data[0]['time_approx'])
 
-    async def get_atms_in_radius(self, client_location, radius):
-        cursor = self.collection.find({
+    async def get_atms_in_radius(self, client_location, radius, deposit=False):
+        query = {
             'location': {
                 '$near': {
                     '$geometry': {
@@ -43,7 +44,11 @@ class ATMLocatorService(RequestHandler):
                     '$maxDistance': radius
                 }
             }
-        })
+        }
+        if deposit:
+            query['deposit'] = True
+
+        cursor = self.collection.find(query)
         
         atms = []
         async for document in cursor:

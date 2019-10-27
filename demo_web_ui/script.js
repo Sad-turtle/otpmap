@@ -1,4 +1,4 @@
-var ENDPOINT_URL = "https://100.98.2.198:8080/";
+var ENDPOINT_URL = "https://100.98.2.198:8080";
 
 function initMap() {
     var location = {latitude: 47.497913, longitude: 19.040236};
@@ -123,7 +123,7 @@ $(document).ready(function() {
             var atm_id = $(this).prev('input').val();
             //var atm_id = $("#atm_id_0").val();
             $.ajax({
-              url: "https://100.98.2.198:8080/qr/" + guid + "/",
+              url: ENDPOINT_URL + "/qr/" + guid + "/",
               data: {atm_id: atm_id},
               type: "GET",
               dataType: "json"
@@ -140,7 +140,7 @@ $(document).ready(function() {
                "latitude": gps_location.latitude,
                "longitude": gps_location.longitude};
        $.ajax({
-          url: "https://100.98.2.198:8080/atms/" + guid + "/",
+          url: ENDPOINT_URL + "/atms/" + guid + "/",
           data: gps_location,
           type: "GET",
           dataType: "json"
@@ -156,8 +156,8 @@ $(document).ready(function() {
                "deposit":true
            };
        $.ajax({
-          url: "https://100.98.2.198:8080/atms/" + guid + "/",
-          data: gps_location,
+          url: ENDPOINT_URL + "/atms/" + guid + "/",
+          data: data,
           type: "GET",
           dataType: "json"
         }).done(displayATMList);
