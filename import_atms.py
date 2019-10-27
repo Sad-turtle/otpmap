@@ -21,17 +21,17 @@ for row in reader:
             'stats': {}
         }
     atm = atms[key]
-    day = row['TRX_DAY'].lower()
-    atm['stats']['day'] = {}
+    day = row['TRX_DAY'].lower().strip()
+    atm['stats'][day] = {}
     
-    for hour in range(0, 23):
+    for hour in range(0, 24):
         period_1 = 'TRAN_CNT_{:02}00_{:02}30'.format(hour, hour)
         period_2 = 'TRAN_CNT_{:02}30_{:02}00'.format(hour, hour + 1)
         
-        stat_1 = {'minutes_start': 0, 'minutes_end': 30, 'value': row[period_1]}
-        stat_2 = {'minutes_start': 30, 'minutes_end': 60, 'value': row[period_2]}
+        stat_1 = {'minutes_start': 0, 'minutes_end': 30, 'value': int(row[period_1])}
+        stat_2 = {'minutes_start': 30, 'minutes_end': 60, 'value': int(row[period_2])}
         
-        atm['stats']['day']['{:02}'.format(hour)] = [stat_1, stat_2]
+        atm['stats'][day]['{:02}'.format(hour)] = [stat_1, stat_2]
 
 atms = list(sorted(atms.values(), key=lambda x: x['location']['coordinates']))
 

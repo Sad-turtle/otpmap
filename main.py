@@ -2,10 +2,14 @@ import tornado.ioloop
 from tornado.web import Application
 from tornado.ioloop import IOLoop
 
-from atmlocator import ATMLocatorService
+from locator import ATMLocatorService
+from qr import WithdrawalQRCodeService
     
 def make_app():
-  urls = [("/atms/([^/]+)/", ATMLocatorService)]
+  urls = [
+      ("/atms/([^/]+)/", ATMLocatorService),
+      ("/withdraw/([^/]+)/", WithdrawalQRCodeService)
+  ]
   return Application(urls)
 
 if __name__ == '__main__':
