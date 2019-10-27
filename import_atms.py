@@ -18,6 +18,7 @@ for row in reader:
             'city': row['CITY'],
             'deposit': row['ATM_DEPOSIT_FL'] == 'Y',
             'cash_remain': 1000000,
+            'address': row['STREET_ADDRESS'],
             'stats': {}
         }
     atm = atms[key]

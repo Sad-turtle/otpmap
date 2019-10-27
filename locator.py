@@ -1,10 +1,12 @@
+import datetime
 import json
 from tornado.web import RequestHandler
 import motor.motor_tornado
 
+from pending import store_pending_visitor
 from ranking import calculate_atm_ranking
 
-client = motor.motor_tornado.MotorClient('mongodb://localhost:27017')
+client = motor.motor_tornado.MotorClient()
 db = client['otpmap']
 
 class ATMLocatorService(RequestHandler):
@@ -21,12 +23,15 @@ class ATMLocatorService(RequestHandler):
         latitude = float(self.get_argument("latitude", 47.451316, True))
         point = [longitude, latitude]
         print('Current location is: ', point)
-        
+
         atms = await self.get_atms_in_radius(point, 3000)
-        data = calculate_atm_ranking(point, atms)
-        
+        data = await calculate_atm_ranking(point, atms)
+
         self.write(json.dumps({'type': 'atmlist', 'data': data}))
-                
+
+        if data:
+            await store_pending_visitor(uuid, data[0]['_id'], datetime.datetime.now(), data[0]['time_approx'])
+
     async def get_atms_in_radius(self, client_location, radius):
         cursor = self.collection.find({
             'location': {

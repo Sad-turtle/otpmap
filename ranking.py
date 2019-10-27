@@ -3,6 +3,7 @@ import math
 import motor.motor_tornado
 import geopy.distance
 import datetime
+from pending import pending_visitor_count
 
 def get_statistical_tpm_rate(atm, time_now):
     """Return approximated transaction count per minute for given time"""
@@ -26,7 +27,7 @@ def get_statistical_tpm_rate(atm, time_now):
         if time_now.minute <= stats_data['minutes_end']:
             return stats_data['value'] / (stats_data['minutes_end'] - stats_data['minutes_start'])
 
-def calculate_atm_ranking(client_location, atms):
+async def calculate_atm_ranking(client_location, atms, desired_amount=0):
     data = []
     nearby_atms = []
     other_atms = []
@@ -38,7 +39,7 @@ def calculate_atm_ranking(client_location, atms):
         print('ATM at {} is {:.2f}m from us'.format(tuple(reversed(atm_location)), distance_meters))
 
         # Our computation makes sense only for ATMs in walking vicinity of approx 1km            
-        if distance_meters <= 1000:
+        if distance_meters <= 1000 and atm['cash_remain'] >= desired_amount:
             nearby_atms.append(atm)
         else:
             other_atms.append(atm)
@@ -52,10 +53,12 @@ def calculate_atm_ranking(client_location, atms):
         
     for atm in nearby_atms:
         time_to_go = atm['distance'] / 5000 * 60 # assume person is moving approx 5 km/hour
-        #time_now = datetime.datetime.now()
+        time_now = datetime.datetime.now()
         # For testing:
-        time_now = datetime.datetime(2019, 10, 26, 13, 15)
+        #time_now = datetime.datetime(2019, 10, 26, 13, 15)
         approximate_tpm = get_statistical_tpm_rate(atm, time_now)
+        # Consider each coming person from app as requring additional minute
+        coming_people = await pending_visitor_count(atm['_id'], time_now)
                     
         # Assume that one transaction can take up to 2 minutes
         # By taking into an account the time that is needed for one person to come and subtracting it from 2 minutes
@@ -63,12 +66,14 @@ def calculate_atm_ranking(client_location, atms):
         # we will get the size of queue, and it is rounded up to the next integeter for the worst case scenario
         trans_time = 2
         if approximate_tpm > 0 and trans_time > 1 / approximate_tpm:
-            time_approx = time_to_go + math.ceil((time_to_go) / (abs(trans_time - 1 / approximate_tpm))) * trans_time
+            time_approx = time_to_go + math.ceil((time_to_go) / (abs(trans_time - 1 / approximate_tpm))) * trans_time + coming_people
         else:
-            time_approx = time_to_go
+            time_approx = time_to_go + coming_people
 
-        atm['time_approx'] = math.ceil(time_to_go)
+        atm['time_approx'] = math.ceil(time_approx)
+
+        print('Time to go is {} minutes, statistical ATM usage is {} transactions/minute, {} coming people from app, approx. time: {}'.format(time_to_go, approximate_tpm, coming_people, time_approx))
         
-        print('Time to go is {} minutes, statistical ATM usage is {} transactions/minute, approx. time: {}'.format(time_to_go, approximate_tpm, time_approx))
+    nearby_atms.sort(key=lambda x: x['time_approx'])
     
     return nearby_atms + other_atms

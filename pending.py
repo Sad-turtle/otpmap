@@ -6,7 +6,7 @@ import motor.motor_tornado
 import geopy.distance
 import datetime
 
-client = motor.motor_tornado.MotorClient('mongodb://localhost:27017')
+client = motor.motor_tornado.MotorClient()
 db = client['otpmap']
 collection = db['pending_visitors']
 
@@ -19,24 +19,26 @@ class ConfirmATMSelectionService(RequestHandler):
 
     async def get(self, uuid):
         suggestion_id = self.get_argument("suggestion_id", 0, True)
-        await confirm_pending_visitor(suggestion_id)
+        atm_id = self.get_argument("atm_id", 0, True)
+
+        await confirm_pending_visitor(suggestion_id, atm_id)
         # It is not important for the client whether this fails or not
         self.write(json.dumps({'type': 'status', 'data': 'OK'}))
 
 async def store_pending_visitor(uuid, atm_id, time_now, approx_time_minutes):
     await clear_outgoing_pending_visitor_entry(uuid)
     
-    expiration_time = datetime.datetime.timestamp(time_now) + approx_time_minutes * 60 * 1000
+    expiration_time = datetime.datetime.timestamp(time_now) + approx_time_minutes * 60
     pending_visitor = {"uuid": uuid, "atm_id": atm_id, "expiration_time": expiration_time, "active": False}
     result = await collection.insert_one(pending_visitor)
-    pending_visitor['_id'] = str(result.inserted_it)
+    pending_visitor['_id'] = str(result.inserted_id)
     
-async def confirm_pending_visitor(uuid, suggestion_id):
-    await collection.update_one({'_id': suggestion_id}, {'$set': {'active': 'True'}})
+async def confirm_pending_visitor(uuid, atm_id):
+    await collection.update_one({'uuid': uuid}, {'$set': {'active': True, 'atm_id': atm_id}})
 
-async def pending_visitor_count(uuid, atm_id, target_time):
+async def pending_visitor_count(atm_id, target_time):
     expiration_time = datetime.datetime.timestamp(target_time)
-    count = await collection.count({"atm_id": atm_id, "expiration_time": {"$gt": expiration_time}, "active": True})
+    count = await collection.count_documents({"atm_id": atm_id, "expiration_time": {"$gt": expiration_time}, "active": True})
     return count
 
 async def clear_outgoing_pending_visitor_entry(uuid):
